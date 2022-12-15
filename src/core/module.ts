@@ -1,3 +1,4 @@
+import { FdpConnectModuleConfig } from './module-config'
 import { Permission } from './permission'
 import { FdpConnectProvider } from './provider'
 import { FdpConnectProviderConfig } from './provider-config'
@@ -8,8 +9,12 @@ export class FdpConnectModule {
   }
   permissions: Permission[] = []
 
+  public static LoadModuleConfig(config: FdpConnectModuleConfig) {
+
+  }
+
   // addProvider<FairOSProvider, FairOSProviderConfig>
-  addProvider<T extends FdpConnectProvider, A extends FdpConnectProviderConfig>(
+  private addProvider<T extends FdpConnectProvider, A extends FdpConnectProviderConfig>(
     provider: new (config: FdpConnectProviderConfig) => T,
     providerConfig: A,
   ) {

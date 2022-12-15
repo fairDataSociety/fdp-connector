@@ -25,7 +25,8 @@
   "homepage": "https://github.com/fairDataSociety/fairdrive-connector#readme",
   "dependencies": {
     "@ethersphere/swarm-cid": "^0.1.0",
-    "@fairdatasociety/beeson": "^0.1.1"
+    "@fairdatasociety/beeson": "^0.1.1",
+    "file-system-access": "^1.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
