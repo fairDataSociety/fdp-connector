@@ -15,13 +15,14 @@ export interface FdpOptions {
 }
 
 export interface ProviderDriver {
-  exists: (...args: any[]) => Promise<any> // no typing yet...
-  create: (...args: any[]) => Promise<any> // no typing yet...
-  delete: (...args: any[]) => Promise<any> // no typing yet...
-  read: (...args: any[]) => Promise<any> // no typing yet...
-  download: (...args: any[]) => Promise<any> // no typing yet...
-  upload: (...args: any[]) => Promise<any> // no typing yet...
+  exists: (name: string, mount: Mount) => Promise<boolean>
+  createDir: (name: string, mount: Mount) => Promise<any>
+  delete: (name: string, mount: Mount) => Promise<any>
+  read: (mount: Mount) => Promise<any>
+  download: (name: string, mount: Mount, options: any) => Promise<any>
+  upload: (file: File, mount: Mount, options: any) => Promise<any>
 }
+
 export abstract class FdpConnectProvider {
   constructor(private config: FdpConnectProviderConfig) {}
 }
@@ -35,9 +36,10 @@ export interface Mount {
 }
 
 export class FairDriveMount implements Mount {
-  path: string
-  name: string
+  path = ''
+  name = ''
 }
+
 class Sink implements UnderlyingSink<WriteChunk> {
   private file: File
   private position = 0
@@ -145,13 +147,13 @@ export class FolderHandle implements FileSystemFolderHandleAdapter {
     const entries = await this.driver.read(this.mount)
 
     if (entries && entries.getDirectories().length > 0) {
-      for (let entry of entries.getDirectories()) {
+      for (const entry of entries.getDirectories()) {
         yield [entry.name, new FolderHandle(this.mount, this.driver, this.name)] as [string, FolderHandle]
       }
     }
 
     if (entries && entries.getFiles().length > 0) {
-      for (let entry of entries.getFiles()) {
+      for (const entry of entries.getFiles()) {
         yield [entry.name, new FileHandle(this.mount, this.driver, this.name)] as [string, FileHandle]
       }
     }
@@ -164,7 +166,7 @@ export class FolderHandle implements FileSystemFolderHandleAdapter {
   async getDirectoryHandle(name: string, opts: FileSystemGetDirectoryOptions = {}) {
     return new Promise<FolderHandle>(async (resolve, reject) => {
       if (opts.create) {
-        await this.driver.create(this.mount.name, `${this.mount.path}${name}`)
+        await this.driver.createDir(this.mount.name, `${this.mount.path}${name}`)
 
         resolve(new FolderHandle(this.mount, this.driver, name))
       } else {
@@ -206,6 +208,7 @@ export class FolderHandle implements FileSystemFolderHandleAdapter {
     })
   }
 }
+
 const adapter: Adapter<FdpOptions> = async (mount: Mount, driver: ProviderDriver) =>
   new Promise(resolve => {
     resolve(new FolderHandle(mount, driver, ''))
