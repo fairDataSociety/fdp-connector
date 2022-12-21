@@ -1,4 +1,4 @@
-import { FdpConnectProvider, Mount, ProviderDriver } from '../core/provider'
+import { Entries, FdpConnectProvider, Mount, ProviderDriver } from '../core/provider'
 
 export class FairosProvider extends FdpConnectProvider implements ProviderDriver {
   constructor(private host: string = 'https://fairos.dev.fairdatasociety.org/') {
@@ -109,8 +109,28 @@ export class FairosProvider extends FdpConnectProvider implements ProviderDriver
     return res.json()
   }
 
-  async read(mount: Mount): Promise<any> {
-    // return this.fdp.directory.read(mount.name, mount.path)
+  async read(path: string, mount: Mount): Promise<Entries> {
+    const res = await fetch(`${this.host}v1/dir/ls?dirPath=${path}&podName=${mount.name}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+
+    if (res.status === 200) {
+      const data = await res.json()
+
+      return {
+        dirs: data.dirs,
+        files: data.files,
+      }
+    } else {
+      return {
+        dirs: [],
+        files: [],
+      }
+    }
   }
 
   /**

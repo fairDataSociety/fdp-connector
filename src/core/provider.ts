@@ -14,11 +14,16 @@ export interface FdpOptions {
   path: string
 }
 
+export interface Entries {
+  files: string[]
+  dirs: string[]
+}
+
 export interface ProviderDriver {
   exists: (name: string, mount: Mount) => Promise<boolean>
   createDir: (name: string, mount: Mount) => Promise<any>
   delete: (name: string, mount: Mount) => Promise<any>
-  read: (mount: Mount) => Promise<any>
+  read: (path: string, mount: Mount) => Promise<Entries>
   download: (name: string, mount: Mount, options: any) => Promise<any>
   upload: (file: File, mount: Mount, options: any) => Promise<any>
 }

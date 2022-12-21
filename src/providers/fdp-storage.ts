@@ -24,7 +24,6 @@ export class FdpStorageProvider extends FdpConnectProvider implements ProviderDr
    * Create a directory
    * @param name - name of the directory
    * @param mount - mount to create the directory in
-   * @returns 
    */
   async createDir(name: string, mount: Mount): Promise<any> {
     return this.fdp.directory.create(mount.name, `${mount.path}${name}`)
@@ -34,7 +33,6 @@ export class FdpStorageProvider extends FdpConnectProvider implements ProviderDr
    * Delete a file
    * @param name - name of the file
    * @param mount - mount to delete the file from
-   * @returns 
    */
   async delete(name: string, mount: Mount): Promise<any> {
     return this.fdp.file.delete(mount.name, `${mount.path}${name}`)
@@ -42,11 +40,17 @@ export class FdpStorageProvider extends FdpConnectProvider implements ProviderDr
 
   /**
    * Read a directory
+   * @param path - path to read the directory from
    * @param mount - mount to read the directory from
-   * @returns 
+   * @returns - list of files and directories
    */
-  async read(mount: Mount): Promise<any> {
-    return this.fdp.directory.read(mount.name, mount.path)
+  async read(path: string, mount: Mount): Promise<any> {
+    const res = await this.fdp.directory.read(mount.name, `${mount.path}${path}`)
+
+    return {
+      files: res.getFiles(),
+      dirs: res.getDirectories(),
+    }
   }
 
   /**
