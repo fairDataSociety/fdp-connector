@@ -214,9 +214,9 @@ export class FolderHandle implements FileSystemFolderHandleAdapter {
   }
 }
 
-const adapter: Adapter<FdpOptions> = async (mount: Mount, driver: ProviderDriver) =>
+const FdpConnectAdapter: Adapter<FdpOptions> = async (mount: Mount, driver: ProviderDriver) =>
   new Promise(resolve => {
     resolve(new FolderHandle(mount, driver, ''))
   })
 
-export default adapter
+export default FdpConnectAdapter

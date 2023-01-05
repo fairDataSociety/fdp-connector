@@ -1,23 +1,15 @@
+import { Adapter } from 'file-system-access/lib/interfaces'
 import { FdpConnectModuleConfig } from './module-config'
 import { Permission } from './permission'
-import { FdpConnectProvider } from './provider'
+import { FdpConnectProvider, FdpOptions } from './provider'
 import { FdpConnectProviderConfig } from './provider-config'
 
 export class FdpConnectModule {
-  providers!: {
-    [providerName: string]: FdpConnectProvider
-  }
-  permissions: Permission[] = []
+  constructor(public config: FdpConnectModuleConfig) {}
 
-  public static LoadModuleConfig(config: FdpConnectModuleConfig) {
+  async bind(providerName: string): Promise<Adapter<FdpOptions>> {
+    const p = await import(this.config[providerName].provider as string)
 
-  }
-
-  // addProvider<FairOSProvider, FairOSProviderConfig>
-  private addProvider<T extends FdpConnectProvider, A extends FdpConnectProviderConfig>(
-    provider: new (config: FdpConnectProviderConfig) => T,
-    providerConfig: A,
-  ) {
-    this.providers[providerConfig.name] = new provider(providerConfig)
+    return p.default
   }
 }
