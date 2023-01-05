@@ -9,11 +9,13 @@ import { FdpConnectProviderConfig } from './provider-config'
 const { INVALID, GONE, SYNTAX } = errors
 import { errors } from 'file-system-access/lib/util.js'
 
+// FairDrive adapter options
 export interface FdpOptions {
   mount: string
   path: string
 }
 
+// 
 export interface Entries {
   files: string[]
   dirs: string[]
