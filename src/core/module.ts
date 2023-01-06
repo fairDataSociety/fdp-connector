@@ -1,5 +1,14 @@
-import { getOriginPrivateDirectory } from 'file-system-access'
+import { ReadableStream } from 'file-system-access/lib/web-streams-ponyfill.js'
+import { getOriginPrivateDirectory } from 'file-system-access/lib/node.js'
 import { FdpConnectModuleConfig } from './module-config'
+
+// eslint-disable-next-line
+// @ts-ignore
+globalThis.Blob = Blob
+
+// eslint-disable-next-line
+// @ts-ignores
+globalThis.ReadableStream = ReadableStream
 
 export class Binding<T> {
   fileSystem: FileSystemDirectoryHandle
