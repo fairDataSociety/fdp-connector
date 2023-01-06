@@ -109,8 +109,31 @@ export class FairosProvider extends FdpConnectProvider implements ProviderDriver
     return res.json()
   }
 
-  async read(path: string, mount: Mount): Promise<Entries> {
-    const res = await fetch(`${this.host}v1/dir/ls?dirPath=${path}&podName=${mount.name}`, {
+  async listMounts(): Promise<Mount[]> {
+    const res = await fetch(`${this.host}v1/dir/ls?dirPath=${mount.path}&podName=${mount.name}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+
+    if (res.status === 200) {
+      const data = await res.json()
+
+      return {
+        dirs: data.dirs,
+        files: data.files,
+      }
+    } else {
+      return {
+        dirs: [],
+        files: [],
+      }
+    }
+  }
+  async read(mount: Mount): Promise<Entries> {
+    const res = await fetch(`${this.host}v1/dir/ls?dirPath=${mount.path}&podName=${mount.name}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

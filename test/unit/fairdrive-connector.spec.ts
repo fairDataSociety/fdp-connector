@@ -1,18 +1,22 @@
-import { FDPConnectModule, FDPConnectProvider } from '../../src/core/module'
-import { FairOSAdapter } from '../../src/providers/fairos'
+import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
+
+import { FdpConnectModule } from '../../src/core/module'
+import { FairosProvider } from '../../src/providers/fairos'
 
 describe('fairdrive connector module', () => {
-  let module: FDPConnectModule
+  let module: FdpConnectModule
+  const username = process.env.USERNAME || ''
+  const password = process.env.PASSWORD || ''
+
   beforeAll(async () => {
     // Create a FairdriveConnectorModule
-    module = new FDPConnectModule({
+    module = new FdpConnectModule({
       scopes: ['files:read', 'directory:read'],
       providers: {
         fairos: {
           options: {
-            url: 'https://fairos.dev.fairdatasociety.org/',
-            loginV1: 'https://fairos.dev.fairdatasociety.org/v1/',
-            loginV2: 'https://fairos.dev.fairdatasociety.org/v2/',
+            host: 'https://fairos.staging.fairdatasociety.org/',
           },
           provider: '../../src/providers/fairos',
         },
@@ -21,37 +25,29 @@ describe('fairdrive connector module', () => {
   })
   it('should instantiate module with one provider', async () => {
     // Provider constructor interface: Provider(baseProvider, options { signer })
-    const fairosConnector = module.bind('fairos')
+    const fairosConnector = await module.bind<FairosProvider>('fairos')
 
-    // Query with REST API
-    await fairosConnector.fileSystem.listPods()
-
-    // Query with GraphQL
-    await fairosConnector.fileSystem.query(`pods() { name  }`)
+    expect(fairosConnector.fileSystem).toBeDefined()
   })
 
   it('should list mounts', async () => {
     // Provider constructor interface: Provider(baseProvider, options { signer })
-    const fairosConnector = module.bind('fairos')
+    const fairosConnector = await module.bind<FairosProvider>('fairos')
 
-    // Query with REST API
-    await fairosConnector.fileSystem.listPods()
+    expect(fairosConnector.fileSystem).toBeDefined()
 
-    // Query with GraphQL
-    await fairosConnector.fileSystem.query(`pods() { name  }`)
+    await fairosConnector.instance.userLogin(username, password)
+    const mounts = await fairosConnector.instance.listMounts()
+    expect(mounts).toBeDefined()
   })
 
   it('should list directories', async () => {
     // Provider constructor interface: Provider(baseProvider, options { signer })
     const fairosConnector = module.bind('fairos')
-
-
   })
 
   it('should list files', async () => {
     // Provider constructor interface: Provider(baseProvider, options { signer })
     const fairosConnector = module.bind('fairos')
-
-
   })
 })

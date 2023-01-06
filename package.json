@@ -27,6 +27,7 @@
     "@ethersphere/swarm-cid": "^0.1.0",
     "@fairdatasociety/beeson": "^0.1.1",
     "@fairdatasociety/fdp-storage": "^0.5.1",
+    "dotenv": "^16.0.3",
     "file-system-access": "^1.0.4"
   },
   "devDependencies": {
