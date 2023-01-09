@@ -1,36 +1,20 @@
-import { ReadableStream } from 'file-system-access/lib/web-streams-ponyfill.js'
-import { getOriginPrivateDirectory } from 'file-system-access/lib/node.js'
 import { FdpConnectModuleConfig } from './module-config'
+import { FdpConnectProvider } from './provider'
 
-// eslint-disable-next-line
-// @ts-ignore
-globalThis.Blob = Blob
-
-// eslint-disable-next-line
-// @ts-ignores
-globalThis.ReadableStream = ReadableStream
-
-export class Binding<T> {
-  fileSystem: FileSystemDirectoryHandle
-  instance: T
-
-  constructor(fileSystem: FileSystemDirectoryHandle, instance: T) {
-    this.fileSystem = fileSystem
-    this.instance = instance
-  }
-}
 export class FdpConnectModule {
+  bindings: Map<string, FdpConnectProvider> = new Map()
   constructor(public config: FdpConnectModuleConfig) {}
 
-  async bind<T>(providerName: string): Promise<Binding<T>> {
-    const provider = await import(this.config.providers[providerName].provider as string)
+  connect<T extends FdpConnectProvider>(providerName: string, provider: { new (): T }) {
+    const providerInstance = new provider()
+    providerInstance.initialize(this.config.providers[providerName].options)
 
-    provider.initialize()
+    this.bindings.set(providerName, providerInstance)
 
-    const fs = await getOriginPrivateDirectory(provider, this.config.providers[providerName].options)
+    return providerInstance
+  }
 
-    const binding = new Binding(fs, provider as T)
-
-    return binding
+  getConnectedProviders<T extends FdpConnectProvider>(providerName: string): T {
+    return this.bindings.get(providerName) as T
   }
 }

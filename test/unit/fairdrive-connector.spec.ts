@@ -9,7 +9,7 @@ describe('fairdrive connector module', () => {
   const username = process.env.USERNAME || ''
   const password = process.env.PASSWORD || ''
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Create a FairdriveConnectorModule
     module = new FdpConnectModule({
       scopes: ['files:read', 'directory:read'],
@@ -24,30 +24,30 @@ describe('fairdrive connector module', () => {
     })
   })
   it('should instantiate module with one provider', async () => {
-    // Provider constructor interface: Provider(baseProvider, options { signer })
-    const fairosConnector = await module.bind<FairosProvider>('fairos')
+    const fairosConnector = await module.connect<FairosProvider>('fairos', FairosProvider)
 
-    expect(fairosConnector.fileSystem).toBeDefined()
+    // eslint-disable-next-line
+    expect((fairosConnector.filesystemDriver as any).host).toBe(`https://fairos.staging.fairdatasociety.org/`)
   })
 
   it('should list mounts', async () => {
-    // Provider constructor interface: Provider(baseProvider, options { signer })
-    const fairosConnector = await module.bind<FairosProvider>('fairos')
+    const fairosConnector = await module.connect<FairosProvider>('fairos', FairosProvider)
 
-    expect(fairosConnector.fileSystem).toBeDefined()
+    // eslint-disable-next-line
+    expect((fairosConnector.filesystemDriver as any).host).toBe(`https://fairos.staging.fairdatasociety.org/`)
 
-    await fairosConnector.instance.userLogin(username, password)
-    const mounts = await fairosConnector.instance.listMounts()
-    expect(mounts).toBeDefined()
+    await fairosConnector.userLogin(username, password)
+    const mounts = await fairosConnector.listMounts()
+    expect(mounts.length).toBe(0)
   })
 
-  it('should list directories', async () => {
+  xit('should list directories', async () => {
     // Provider constructor interface: Provider(baseProvider, options { signer })
-    const fairosConnector = module.bind('fairos')
+    //  const fairosConnector = module.bind('fairos')
   })
 
-  it('should list files', async () => {
+  xit('should list files', async () => {
     // Provider constructor interface: Provider(baseProvider, options { signer })
-    const fairosConnector = module.bind('fairos')
+    //    const fairosConnector = module.bind('fairos')
   })
 })

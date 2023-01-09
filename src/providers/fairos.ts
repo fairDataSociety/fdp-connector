@@ -1,54 +1,11 @@
+import fetch from 'node-fetch'
 import { Entries, FdpConnectProvider, Mount, ProviderDriver } from '../core/provider'
 
-export class FairosProvider extends FdpConnectProvider implements ProviderDriver {
-  constructor(private host: string = 'https://fairos.dev.fairdatasociety.org/') {
-    super({
-      name: 'FairosProvider',
-    })
+export class FairosProviderDriver implements ProviderDriver {
+  host: any
+  constructor(options: { host: string }) {
+    this.host = options.host
   }
-
-  /**
-   * Login a user
-   * @param user - username
-   * @param pass - password
-   * @returns Returns a promise with the response
-   */
-  async userLogin(user: string, pass: string) {
-    const data = {
-      userName: user,
-      password: pass,
-    }
-
-    return await fetch(this.host + 'v2/user/login', {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-      credentials: 'include',
-    })
-  }
-
-  /**
-   * Verify if a user is logged in
-   * @param username - username
-   * @returns Returns a promise with the response
-   */
-  async userLoggedIn(username: string) {
-    const data = {
-      userName: username,
-    }
-
-    return await fetch(this.host + 'v1/user/isloggedin' + '?' + new URLSearchParams(data), {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-  }
-
   /**
    * Verify if a file exists
    * @param path - path to the file
@@ -109,29 +66,6 @@ export class FairosProvider extends FdpConnectProvider implements ProviderDriver
     return res.json()
   }
 
-  async listMounts(): Promise<Mount[]> {
-    const res = await fetch(`${this.host}v1/dir/ls?dirPath=${mount.path}&podName=${mount.name}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-
-    if (res.status === 200) {
-      const data = await res.json()
-
-      return {
-        dirs: data.dirs,
-        files: data.files,
-      }
-    } else {
-      return {
-        dirs: [],
-        files: [],
-      }
-    }
-  }
   async read(mount: Mount): Promise<Entries> {
     const res = await fetch(`${this.host}v1/dir/ls?dirPath=${mount.path}&podName=${mount.name}`, {
       method: 'GET',
@@ -206,5 +140,82 @@ export class FairosProvider extends FdpConnectProvider implements ProviderDriver
     })
 
     return res.json()
+  }
+}
+
+export class FairosProvider extends FdpConnectProvider {
+  constructor(private host: string = 'https://fairos.dev.fairdatasociety.org/') {
+    super({
+      name: 'FairosProvider',
+    })
+  }
+
+  initialize(options: any): void {
+    super.initialize(options)
+    this.filesystemDriver = new FairosProviderDriver(options)
+  }
+  /**
+   * Login a user
+   * @param user - username
+   * @param pass - password
+   * @returns Returns a promise with the response
+   */
+  async userLogin(user: string, pass: string) {
+    const data = {
+      userName: user,
+      password: pass,
+    }
+
+    return await fetch(this.host + 'v2/user/login', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    })
+  }
+
+  /**
+   * Verify if a user is logged in
+   * @param username - username
+   * @returns Returns a promise with the response
+   */
+  async userLoggedIn(username: string) {
+    const data = {
+      userName: username,
+    }
+
+    return await fetch(this.host + 'v1/user/isloggedin' + '?' + new URLSearchParams(data), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+  }
+
+  async listMounts(): Promise<Mount[]> {
+    const res = await fetch(`${this.host}v1/pod/ls`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+
+    if (res.status === 200) {
+      const data = await res.json()
+
+      return data.podName.map((name: string) => {
+        return {
+          name,
+          path: '/',
+        }
+      })
+    } else {
+      return []
+    }
   }
 }

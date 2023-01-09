@@ -8,7 +8,7 @@
     "url": "git+https://github.com/fairDataSociety/fairdrive-connector.git"
   },
   "scripts": {
-    "test": "jest --verbose",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --verbose",
     "compile": "webpack --progress --env target=node",
     "compile:types": "tsc --emitDeclarationOnly --declaration --skipLibCheck"
   },
@@ -28,7 +28,8 @@
     "@fairdatasociety/beeson": "^0.1.1",
     "@fairdatasociety/fdp-storage": "^0.5.1",
     "dotenv": "^16.0.3",
-    "file-system-access": "^1.0.4"
+    "file-system-access": "^1.0.4",
+    "node-fetch": "^2.6.7"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
@@ -36,7 +37,7 @@
     "@babel/plugin-transform-runtime": "^7.17.0",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
-    "@types/jest": "^28.0.0",
+    "@types/jest": "^28.1.8",
     "@types/terser-webpack-plugin": "^5.2.0",
     "@types/webpack-bundle-analyzer": "^4.4.1",
     "@typescript-eslint/eslint-plugin": "^5.17.0",

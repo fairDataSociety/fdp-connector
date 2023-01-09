@@ -5,7 +5,6 @@ import {
   WriteChunk,
 } from 'file-system-access/lib/interfaces'
 
-import { FdpConnectProviderConfig } from './provider-config'
 const { INVALID, GONE, SYNTAX } = errors
 import { errors } from 'file-system-access/lib/util.js'
 
@@ -31,9 +30,10 @@ export interface ProviderDriver {
 }
 
 export abstract class FdpConnectProvider {
-  constructor(private config: FdpConnectProviderConfig) {}
+  constructor(private config: any) {}
 
-  initialize(options: object) {
+  filesystemDriver!: ProviderDriver
+  initialize(options: any) {
     Object.assign(this, options)
   }
 }
@@ -221,7 +221,7 @@ export class FolderHandle implements FileSystemFolderHandleAdapter {
   }
 }
 
-const FdpConnectAdapter: Adapter<FdpOptions> = async (mount: Mount, driver: ProviderDriver) =>
+const FdpConnectAdapter = async (mount: Mount, driver: ProviderDriver) =>
   new Promise(resolve => {
     resolve(new FolderHandle(mount, driver))
   })
