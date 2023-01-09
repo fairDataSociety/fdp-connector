@@ -1,5 +1,4 @@
 import {
-  Adapter,
   FileSystemFileHandleAdapter,
   FileSystemFolderHandleAdapter,
   WriteChunk,
