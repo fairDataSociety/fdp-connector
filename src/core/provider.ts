@@ -19,6 +19,9 @@ export interface Entries {
   dirs: string[]
 }
 
+/**
+ * ProviderDriver is the interface that all providers must implement that adheres for W3C FileSystem API.
+ */
 export interface ProviderDriver {
   exists: (name: string, mount: Mount) => Promise<boolean>
   createDir: (name: string, mount: Mount) => Promise<any>
@@ -28,6 +31,9 @@ export interface ProviderDriver {
   upload: (file: File, mount: Mount, options: any) => Promise<any>
 }
 
+/**
+ * FdpConnectProvider is the base class for all providers.
+ */
 export abstract class FdpConnectProvider {
   constructor(private config: any) {}
 
@@ -40,8 +46,13 @@ export abstract class FdpConnectProvider {
 const File = globalThis.File
 const Blob = globalThis.Blob
 
+/**
+ * Mount represents a logical mount point for a provider to be mounted on.
+ */
 export interface Mount {
+  // path to the mount point
   path: string
+  // name of the mount point
   name: string
 }
 
@@ -64,7 +75,7 @@ class Sink implements UnderlyingSink<WriteChunk> {
   }
 
   /**
-   *
+   * Returns true if the file exists, else false
    * @param key
    * @param options
    * @returns
@@ -219,7 +230,12 @@ export class FolderHandle implements FileSystemFolderHandleAdapter {
     })
   }
 }
-
+/**
+ * FdpConnectAdapter is a function that returns a promise that resolves to a FolderHandle
+ * @param mount Mount point
+ * @param driver Driver to use
+ * @returns A promise that resolves to a FolderHandle
+ */
 const FdpConnectAdapter = async (mount: Mount, driver: ProviderDriver) =>
   new Promise(resolve => {
     resolve(new FolderHandle(mount, driver))

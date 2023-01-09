@@ -1,6 +1,8 @@
 import fetch from 'node-fetch'
 import { Entries, FdpConnectProvider, Mount, ProviderDriver } from '../core/provider'
-
+/**
+ * FairosProviderDriver is the driver for the FairOS provider.
+ */
 export class FairosProviderDriver implements ProviderDriver {
   host: any
   constructor(options: { host: string }) {
@@ -142,7 +144,9 @@ export class FairosProviderDriver implements ProviderDriver {
     return res.json()
   }
 }
-
+/**
+ * FairosProvider is the provider for the FairOS provider.
+ */
 export class FairosProvider extends FdpConnectProvider {
   constructor(private host: string = 'https://fairos.dev.fairdatasociety.org/') {
     super({
