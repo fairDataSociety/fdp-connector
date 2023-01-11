@@ -1,4 +1,6 @@
+import { getOriginPrivateDirectory } from 'file-system-access'
 import {
+  Adapter,
   FileSystemFileHandleAdapter,
   FileSystemFolderHandleAdapter,
   WriteChunk,
@@ -6,29 +8,12 @@ import {
 
 const { INVALID, GONE, SYNTAX } = errors
 import { errors } from 'file-system-access/lib/util.js'
-
-// FairDrive adapter options
-export interface FdpOptions {
-  mount: string
-  path: string
-}
+import { ProviderDriver } from './provider-driver'
 
 //
 export interface Entries {
   files: string[]
   dirs: string[]
-}
-
-/**
- * ProviderDriver is the interface that all providers must implement that adheres for W3C FileSystem API.
- */
-export interface ProviderDriver {
-  exists: (name: string, mount: Mount) => Promise<boolean>
-  createDir: (name: string, mount: Mount) => Promise<any>
-  delete: (name: string, mount: Mount) => Promise<any>
-  read: (mount: Mount) => Promise<Entries>
-  download: (name: string, mount: Mount, options: any) => Promise<any>
-  upload: (file: File, mount: Mount, options: any) => Promise<any>
 }
 
 /**
@@ -40,6 +25,17 @@ export abstract class FdpConnectProvider {
   filesystemDriver!: ProviderDriver
   initialize(options: any) {
     Object.assign(this, options)
+  }
+
+  /**
+   * getFSHandler returns a FileSystemDirectoryHandle for the given provider.
+   * @param mount - mount point
+   * @returns a FileSystemDirectoryHandle
+   */
+  async getFSHandler(mount: Mount) {
+    const adapter = await import('./adapter') // FdpConnectAdapter(mount, this.filesystemDriver)
+
+    return getOriginPrivateDirectory(adapter, { mount, driver: this.filesystemDriver })
   }
 }
 
@@ -230,15 +226,3 @@ export class FolderHandle implements FileSystemFolderHandleAdapter {
     })
   }
 }
-/**
- * FdpConnectAdapter is a function that returns a promise that resolves to a FolderHandle
- * @param mount Mount point
- * @param driver Driver to use
- * @returns A promise that resolves to a FolderHandle
- */
-const FdpConnectAdapter = async (mount: Mount, driver: ProviderDriver) =>
-  new Promise(resolve => {
-    resolve(new FolderHandle(mount, driver))
-  })
-
-export default FdpConnectAdapter

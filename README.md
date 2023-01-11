@@ -13,12 +13,12 @@ import {
 
 // Create a FdpConnectModule
 module = new FdpConnectModule({
-  scopes: ['files:read', 'directory:read'],
   providers: {
     fairos: {
       options: {
         host: 'https://fairos.staging.fairdatasociety.org/',
       },
+      capabilities: ['filesystem:w3c', 'data:graphql', 'data:sql'],
       provider: '@fairdatasociety/providers/fairos',
     },
   },
@@ -32,6 +32,13 @@ await fairosConnector.userLogin(username, password)
 
 // list all mounts / pods
 const mounts = await fairosConnector.listMounts()
+
+// W3C FileSystem
+
+
+// Graphql
+
+// Arrow SQL
 ```
 
 

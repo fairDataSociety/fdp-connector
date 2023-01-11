@@ -1,5 +1,6 @@
 import fetch from 'node-fetch'
-import { Entries, FdpConnectProvider, Mount, ProviderDriver } from '../core/provider'
+import { Mount, Entries, FdpConnectProvider } from '../core/provider'
+import { ProviderDriver } from '../core/provider-driver'
 /**
  * FairosProviderDriver is the driver for the FairOS provider.
  */
@@ -156,7 +157,6 @@ export class FairosProvider extends FdpConnectProvider {
 
   initialize(options: any): void {
     super.initialize(options)
-    this.filesystemDriver = new FairosProviderDriver(options)
   }
   /**
    * Login a user
@@ -212,7 +212,7 @@ export class FairosProvider extends FdpConnectProvider {
     if (res.status === 200) {
       const data = await res.json()
 
-      return data.podName.map((name: string) => {
+      return data.pods.map((name: string) => {
         return {
           name,
           path: '/',
