@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
 dotenv.config()
-
+import { faker } from '@faker-js/faker'
 import { FdpConnectModule } from '../../src/core/module'
 import { FairosProvider } from '../../src/providers/fairos'
 import fetchMock from 'jest-fetch-mock'
@@ -41,10 +41,10 @@ describe('fairdrive connector module', () => {
     expect(fairosConnector).toBeDefined()
     fetchMock.mockResponseOnce(
       JSON.stringify({
-        address: 'string',
-        message: 'string',
-        nameHash: 'string',
-        publicKey: 'string',
+        address: faker.finance.ethereumAddress(),
+        message: 'mock response ',
+        nameHash: faker.datatype.hexadecimal({ length: 32, prefix: '', case: 'lower' }),
+        publicKey: faker.datatype.hexadecimal({ length: 64, prefix: '', case: 'lower' }),
       }),
     )
 
@@ -71,10 +71,10 @@ describe('fairdrive connector module', () => {
     expect(fairosConnector).toBeDefined()
     fetchMock.mockResponseOnce(
       JSON.stringify({
-        address: 'string',
-        message: 'string',
-        nameHash: 'string',
-        publicKey: 'string',
+        address: faker.finance.ethereumAddress(),
+        message: 'mock response ',
+        nameHash: faker.datatype.hexadecimal({ length: 32, prefix: '', case: 'lower' }),
+        publicKey: faker.datatype.hexadecimal({ length: 64, prefix: '', case: 'lower' }),
       }),
     )
 
@@ -91,10 +91,43 @@ describe('fairdrive connector module', () => {
 
     const mounts = await fairosConnector.listMounts()
     expect(fetchMock).toHaveBeenCalled()
-
     expect(mounts.length).toBe(3)
 
-    await fairosConnector.getFSHandler(mounts[0])
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        dirs: [
+          {
+            accessTime: faker.datatype.datetime().getTime(),
+            blockSize: '1024',
+            contentType: faker.system.mimeType(),
+            creationTime: faker.datatype.datetime().getTime(),
+            mode: 0,
+            modificationTime: faker.datatype.datetime().getTime(),
+            name: faker.system.fileName(),
+            size: faker.datatype.number(),
+          },
+        ],
+        files: [
+          {
+            accessTime: faker.datatype.datetime().getTime(),
+            blockSize: '1024',
+            contentType: faker.system.mimeType(),
+            creationTime: faker.datatype.datetime().getTime(),
+            mode: 0,
+            modificationTime: faker.datatype.datetime().getTime(),
+            name: faker.system.fileName(),
+            size: faker.datatype.number(),
+            tag: 0,
+          },
+        ],
+      }),
+    )
+
+    const fs = await fairosConnector.getFSHandler(mounts[0])
+    const entries = fs.entries()
+    for await (const entry of entries) {
+      console.log(entry)
+    }
   })
 
   xit('should list files', async () => {

@@ -157,6 +157,8 @@ export class FairosProvider extends FdpConnectProvider {
 
   initialize(options: any): void {
     super.initialize(options)
+
+    this.filesystemDriver = new FairosProviderDriver(options)
   }
   /**
    * Login a user
